@@ -22,22 +22,27 @@ async function main() {
 
   const db = client.db('my-memoapp');
 
-  app.get('/', async (req, res) => {
+  app.get('/', logMiddleware, async (req, res) => {
     try {
+
       const memos = await db.collection('memo').find().toArray();
       const tytles = memos.map((memo) => {
-         return memo.tytle ;
-        });
-      
-      res.render(
-        path.resolve(__dirname, 'views/mainpage.ejs'),
-        { tytles: tytles }
-      );
+       return memo.tytle
+      });
 
+      const notes = memos.map((memo) => {
+        return memo.note
+       });
+
+      let text = [];
+      for(let i=0; i <= tytles.length-1; i++){
+        text[i] = tytles[i] + " : " + notes[i];
+      }
+      res.render(path.resolve(__dirname, 'views/mainpage.ejs'), { notes: text });
     } catch (e) {
       console.error(e);
       res.status(500).send('Internal Server Error');
-    }
+    };
   });
 
   app.post('/api/memo', express.json(), async (req, res) => {
@@ -46,20 +51,7 @@ async function main() {
     if (!tytle) {
       res.status(400).send('Bad Request');
       return;
-    }
-    await db.collection('memo').insertOne({ tytle: tytle , note: text });
-    res.status(200).send('Created');
-  });
-
-  
-  app.post('/api/select', express.json(), async (req, res) => {
-    const tytle = req.body.tytle;
-    if (!tytle) {
-      res.status(400).send('Bad Request');
-      return;
-    }
-      
-
+    };
     await db.collection('memo').insertOne({ tytle: tytle , note: text });
     res.status(200).send('Created');
   });
@@ -68,5 +60,19 @@ async function main() {
   app.listen(3000, () => {
     console.log('start listening');
   });
-}
-main()
+};
+main();
+
+/*
+サーバー起動手順
+docker run --rm --name=my-app-db -p 27017:27017 mongo   <- 資料のは間違ってるからこっち
+別ウィンドウで
+docker exec -it my-app-db mongosh
+test> use my-memoapp
+
+中身の確認は
+db.memo.find()
+
+追加は
+my-memoapp> db.memo.insertOne({ tytle: 'tytle', note: 'text' })
+*/
