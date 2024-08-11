@@ -1,0 +1,31 @@
+<!-- index.ejs -->
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>top</title>
+</head>
+
+<body>
+    <input type="text" class="tytle" value="タイトル"/>
+    <p></p>
+    <textarea name="comment" class="input-text" cols="40" rows="8"></textarea>
+    <button class="send-button">送信</button>
+    <script src="/static/index.js" defer></script>
+    
+    <ul class = "memo-list">
+        <% for (const tytle of tytles) { %>
+          <li class="memo-name"><%= tytle %></li>
+        <% } %>
+    </ul>
+
+</br>
+</br>
+</br>
+
+
+</body>
+
+</html>
